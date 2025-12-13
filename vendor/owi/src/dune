@@ -1,0 +1,175 @@
+(include_subdirs unqualified)
+
+(library
+ (public_name owi)
+ (modules
+  annotated
+  assigned
+  benchmark
+  binary
+  binary_encoder
+  binary_parser
+  binary_to_text
+  binary_validate
+  boolean_intf
+  bug
+  choice_intf
+  call_graph
+  cmd_utils
+  cmd_call_graph
+  cmd_cfg
+  cmd_fmt
+  cmd_instrument_label
+  cmd_iso
+  cmd_replay
+  cmd_run
+  cmd_script
+  cmd_sym
+  cmd_validate
+  cmd_version
+  cmd_wasm2wat
+  cmd_wat2wasm
+  compile
+  concrete_boolean
+  concrete_choice
+  concrete_data
+  concrete_elem
+  concrete_env
+  concrete_extern_func
+  concrete_f32
+  concrete_f64
+  concrete_global
+  concrete_i32
+  concrete_i64
+  concrete_memory
+  concrete_ref
+  concrete_table
+  concrete_value
+  concrete_v128
+  concrete_wasm_ffi
+  control_flow_graph
+  data_intf
+  elem_intf
+  env_intf
+  exploration_smart
+  extern
+  float32
+  float64
+  fop_intf
+  f32_intf
+  f64_intf
+  global_intf
+  grouped
+  int32
+  int64
+  i32_intf
+  i64_intf
+  interpret
+  iop_intf
+  kind
+  label
+  link
+  linked
+  link_env
+  log
+  memory_intf
+  model
+  multicore
+  origin
+  owi
+  parse
+  prio
+  priority_queue
+  ref_intf
+  result
+  rewrite
+  scheduler
+  script
+  state_monad
+  symbol_scope
+  share
+  solver
+  symbolic_boolean
+  symbolic_choice
+  symbolic_data
+  symbolic_driver
+  symbolic_elem
+  symbolic_env
+  symbolic_extern_func
+  symbolic_f32
+  symbolic_f64
+  symbolic_global
+  symbolic_global0
+  symbolic_i32
+  symbolic_i64
+  symbolic_memory
+  symbolic_memory0
+  symbolic_path_condition
+  symbolic_parameters
+  symbolic_ref
+  symbolic_table
+  symbolic_table0
+  symbolic_value
+  symbolic_v128
+  symbolic_wasm_ffi
+  spectest
+  stack
+  syntax
+  table_intf
+  text
+  text_lexer
+  text_parser
+  text_validate
+  thread
+  union_find
+  value_intf
+  v128_intf
+  wasm_ffi_intf
+  wast
+  wutf8)
+ (private_modules binary_parser spectest text_lexer text_parser wutf8)
+ (libraries
+  bos
+  digestif
+  dune-build-info
+  dune-site
+  fmt
+  fmt.cli
+  fmt.tty
+  smtml
+  hc
+  logs
+  logs.cli
+  logs.fmt
+  logs.threaded
+  menhirLib
+  ocamlgraph
+  ocaml_intrinsics
+  ppxlib
+  prelude
+  processor
+  sedlex
+  synchronizer
+  uutf
+  runtime_events
+  mtime
+  mtime.clock
+  xmlm)
+ (flags
+  (:standard -open Prelude))
+ (preprocess
+  (pps sedlex.ppx))
+ (instrumentation
+  (backend bisect_ppx --exclusions src/bisect.exclude)
+  (deps bisect.exclude))
+ (instrumentation
+  (backend landmarks --auto)))
+
+(env
+ (_
+  (flags
+   (-w +a-4-40-41-42-44-45-70-73 -warn-error +a-58))))
+
+(generate_sites_module
+ (module share)
+ (sites owi))

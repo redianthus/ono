@@ -1,0 +1,14 @@
+(include_subdirs no)
+
+(executable
+ (public_name owi)
+ (modes byte exe)
+ (modules owi)
+ (package owi)
+ (libraries cmdliner owi prelude sedlex)
+ (instrumentation
+  (backend bisect_ppx))
+ (flags
+  (:standard -open Prelude))
+ (instrumentation
+  (backend landmarks --auto)))

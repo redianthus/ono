@@ -1,0 +1,12 @@
+(library
+ (public_name ono)
+ (modules
+  concrete_driver
+  concrete_ono_module
+  error
+  symbolic_driver
+  symbolic_ono_module
+  syntax)
+ (libraries fpath kdo logs)
+ (instrumentation
+  (backend bisect_ppx)))

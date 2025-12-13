@@ -1,0 +1,9 @@
+available: (arch = "x86_32" | arch = "x86_64" | arch = "arm64") & os != "win32" & os != "macos" & os != "homebrew"
+depexts: [
+]
+post-messages: [
+  "Thank you for installing Owi!"
+  "To fully utilize Owi, consider installing a solver such as Z3"
+  "Join our community on Zulip: https://owi.zulipchat.com/"
+  "Explore tutorials and documentation here: https://ocamlpro.github.io/owi/"
+]

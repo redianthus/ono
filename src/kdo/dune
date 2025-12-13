@@ -1,0 +1,5 @@
+(library
+ (public_name ono.kdo)
+ (name kdo)
+ (modules kdo)
+ (libraries owi))
