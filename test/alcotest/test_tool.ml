@@ -3,7 +3,7 @@
 (* === Cmd_concrete === *)
 
 let test_normalize_option_int_none () =
-  Alcotest.(check int) "None -> 0" 0 (Cmd_concrete.normalize_option_int None)
+  Alcotest.(check int) "None -> 10" 10 (Cmd_concrete.normalize_option_int None)
 
 let test_normalize_option_int_positive () =
   Alcotest.(check int)
@@ -12,7 +12,7 @@ let test_normalize_option_int_positive () =
 
 let test_normalize_option_int_negative () =
   Alcotest.(check int)
-    "Some (-3) -> 0" 0
+    "Some (-3) -> 10" 10
     (Cmd_concrete.normalize_option_int (Some (-3)))
 
 let test_normalize_option_int_zero () =
