@@ -34,6 +34,8 @@ let text_print_cell (cell : Kdo.Concrete.I32.t) :
   print_string str;
   Ok ()
 
+let text_clear_screen () : (unit, Owi.Result.err) Result.t = Ok ()
+
 let textSet =
   let open Concrete_ono_types in
   {
@@ -50,5 +52,6 @@ let functions =
     ("print_i64", Extern_func (i64 ^->. unit, textSet.print_i64));
     ("read_int", Extern_func (unit ^->. i32, textSet.read_int));
     ("newline", Extern_func (unit ^->. unit, text_newline));
+    ("clear_screen", Extern_func (unit ^->. unit, text_clear_screen));
     ("print_cell", Extern_func (i32 ^->. unit, text_print_cell));
   ]
