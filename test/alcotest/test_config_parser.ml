@@ -3,22 +3,16 @@
 let write_temp_file content =
   let path = Filename.temp_file "ono_test_" ".grid" in
   let oc = open_out path in
-  output_string oc content;
-  close_out oc;
+  Fun.protect
+    ~finally:(fun () -> close_out_noerr oc)
+    (fun () -> output_string oc content);
   path
 
 let cleanup path = try Sys.remove path with Sys_error _ -> ()
 
 let with_temp_file content f =
   let path = write_temp_file content in
-  let result =
-    try Ok (f path)
-    with e ->
-      cleanup path;
-      raise e
-  in
-  cleanup path;
-  match result with Ok v -> v | Error e -> raise e
+  Fun.protect ~finally:(fun () -> cleanup path) (fun () -> f path)
 
 let test_load_valid_simple_grid () =
   with_temp_file "@.\n.@" (fun path ->
