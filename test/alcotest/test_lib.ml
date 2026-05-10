@@ -4,27 +4,28 @@
 
 let test_text_functions_count () =
   Alcotest.(check int)
-    "functions list has 3 entries" 3
+    "functions list has 6 entries" 6
     (List.length Ono.Concrete_ono_text.functions)
 
 let test_text_functions_names () =
   let names = List.map fst Ono.Concrete_ono_text.functions in
   Alcotest.(check (list string))
     "function names"
-    [ "print_i32"; "print_i64"; "read_int" ]
+    [ "print_i32"; "print_i64"; "read_int"; "newline"; "clear_screen"; "print_cell" ]
     names
 
 (* === Concrete_ono_module === *)
 
 let test_module_text_mode_function_count () =
-  let m = Ono.Concrete_ono_module.m false 0 0 in
+  let m = Ono.Concrete_ono_module.m false 0 0 "" 1000 in
   let fns = m.Owi.Extern.Module.functions in
-  (* base: random_i32, get_steps, get_display_last, sleep
-     + text: print_i32, print_i64, read_int *)
-  Alcotest.(check int) "text mode has 7 functions" 7 (List.length fns)
+  (* base: random_i32, get_steps, get_display_last, sleep,
+      get_grid_cell, get_grid_width, get_grid_height, get_speed
+      + text: print_i32, print_i64, read_int, newline, clear_screen, print_cell *)
+  Alcotest.(check int) "text mode has 14 functions" 14 (List.length fns)
 
 let test_module_text_mode_has_base_functions () =
-  let m = Ono.Concrete_ono_module.m false 0 0 in
+  let m = Ono.Concrete_ono_module.m false 0 0 "" 1000 in
   let names = List.map fst m.Owi.Extern.Module.functions in
   Alcotest.(check bool) "has random_i32" true (List.mem "random_i32" names);
   Alcotest.(check bool) "has get_steps" true (List.mem "get_steps" names);
@@ -34,18 +35,18 @@ let test_module_text_mode_has_base_functions () =
   Alcotest.(check bool) "has sleep" true (List.mem "sleep" names)
 
 let test_module_text_mode_has_text_functions () =
-  let m = Ono.Concrete_ono_module.m false 0 0 in
+  let m = Ono.Concrete_ono_module.m false 0 0 "" 1000 in
   let names = List.map fst m.Owi.Extern.Module.functions in
   Alcotest.(check bool) "has print_i32" true (List.mem "print_i32" names);
   Alcotest.(check bool) "has print_i64" true (List.mem "print_i64" names);
   Alcotest.(check bool) "has read_int" true (List.mem "read_int" names)
 
 let test_module_text_mode_no_gui_functions () =
-  let m = Ono.Concrete_ono_module.m false 0 0 in
+  let m = Ono.Concrete_ono_module.m false 0 0 "" 1000 in
   let names = List.map fst m.Owi.Extern.Module.functions in
-  Alcotest.(check bool) "no newline" false (List.mem "newline" names);
-  Alcotest.(check bool) "no clear_screen" false (List.mem "clear_screen" names);
-  Alcotest.(check bool) "no print_cell" false (List.mem "print_cell" names)
+  Alcotest.(check bool) "has newline" true (List.mem "newline" names);
+  Alcotest.(check bool) "has clear_screen" true (List.mem "clear_screen" names);
+  Alcotest.(check bool) "has print_cell" true (List.mem "print_cell" names)
 
 (* === Symbolic_ono_module === *)
 
