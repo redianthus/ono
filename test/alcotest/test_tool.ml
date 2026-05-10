@@ -40,6 +40,27 @@ let test_normalize_option_bool_false () =
     "Some false -> false" false
     (Cmd_concrete.normalize_option_bool (Some false))
 
+let test_normalize_option_fpath_none () =
+  Alcotest.(check string)
+    "None -> empty string" ""
+    (Cmd_concrete.normalize_option_fpath None)
+
+let test_normalize_option_fpath_some () =
+  let p = Fpath.v "grid.txt" in
+  Alcotest.(check string)
+    "Some path -> string" "grid.txt"
+    (Cmd_concrete.normalize_option_fpath (Some p))
+
+let test_normalize_option_speed_none () =
+  Alcotest.(check int)
+    "None -> 1000" 1000
+    (Cmd_concrete.normalize_option_speed None)
+
+let test_normalize_option_speed_some () =
+  Alcotest.(check int)
+    "Some 250 -> 250" 250
+    (Cmd_concrete.normalize_option_speed (Some 250))
+
 let test_seed_generator_none () =
   (* Should not raise *)
   Cmd_concrete.seed_generator None;
@@ -119,6 +140,16 @@ let suite =
         Alcotest.test_case "None" `Quick test_normalize_option_bool_none;
         Alcotest.test_case "true" `Quick test_normalize_option_bool_true;
         Alcotest.test_case "false" `Quick test_normalize_option_bool_false;
+      ] );
+    ( "Cmd_concrete.normalize_option_fpath",
+      [
+        Alcotest.test_case "None" `Quick test_normalize_option_fpath_none;
+        Alcotest.test_case "Some" `Quick test_normalize_option_fpath_some;
+      ] );
+    ( "Cmd_concrete.normalize_option_speed",
+      [
+        Alcotest.test_case "None" `Quick test_normalize_option_speed_none;
+        Alcotest.test_case "Some" `Quick test_normalize_option_speed_some;
       ] );
     ( "Cmd_concrete.seed_generator",
       [
