@@ -10,8 +10,8 @@
   (import "ono" "get_grid_cell" (func $get_grid_cell (param i32) (result i32)))
   (import "ono" "get_speed" (func $get_speed (result i32)))
 
-  (global $WIDTH (mut i32) (i32.const 0))
-  (global $HEIGHT (mut i32) (i32.const 0))
+  (global $WIDTH (mut i32) (i32.const 30))
+  (global $HEIGHT (mut i32) (i32.const 30))
 
   (memory (export "memory") 1)
 

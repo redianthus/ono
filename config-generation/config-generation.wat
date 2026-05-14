@@ -315,5 +315,134 @@
     (return)
   )
 
+  ;; Propriété 4 : Une configuration de départ qui après 4 étapes revient à l'état initial, décalée de (1, 1)
+  ;; i.e il s'agit d'un planeur.
+  ;; WARNING : ne fonctionne pas parfaitement, la propriété est incorrect elle trouve des configurations qui ne sont pas des planeurs.
+  (func $propriete4 (export "propriete4")
+    (local $i i32)
+    (local $len i32)
+    (local $matched i32)
+    (local $changed i32)
+
+    (call $init_grid)
+
+    ;; verifier que ce n'est pas la configuration vide
+    (local.set $i (i32.const 0))
+    (local.set $changed (i32.const 0))
+    (block $break_non_empty
+      (loop $continue_non_empty
+        (if (i32.ne (i32.load8_u (local.get $i)) (i32.const 0))
+          (then
+            (local.set $changed (i32.const 1))
+            (br $break_non_empty)
+          )
+        )
+        (local.set $i (i32.add (local.get $i) (i32.const 1)))
+        (br_if $continue_non_empty (i32.lt_s (local.get $i) (local.get $len)))
+      )
+    )
+
+    (if (i32.eq (local.get $changed) (i32.const 0))
+      (then (return))
+    )
+
+    ;; Vérifier qu'il n'y a aucune cellule vivante sur la ligne du bas ou la colonne de droite
+    ;; S'il y en a, la configuration est rejetée (return)
+    (local.set $i (i32.const 0))
+    (local.set $len (i32.mul (global.get $WIDTH) (global.get $HEIGHT)))
+    (block $break_check_borders
+      (loop $continue_check_borders
+        ;; bord droit (i % WIDTH == WIDTH - 1) ou bord inférieur (i >= WIDTH * (HEIGHT - 1))
+        (if (i32.or
+              (i32.eq (i32.rem_u (local.get $i) (global.get $WIDTH)) (i32.sub (global.get $WIDTH) (i32.const 1)))
+              (i32.ge_u (local.get $i) (i32.mul (global.get $WIDTH) (i32.sub (global.get $HEIGHT) (i32.const 1))))
+            )
+          (then
+            (if (i32.ne (i32.load8_u (local.get $i)) (i32.const 0))
+              (then (return))
+            )
+          )
+        )
+        (local.set $i (i32.add (local.get $i) (i32.const 1)))
+        (br_if $continue_check_borders (i32.lt_s (local.get $i) (local.get $len)))
+      )
+    )
+
+    ;; Enregistre la grille originale à l'offset 2000
+    (local.set $i (i32.const 0))
+    (local.set $len (i32.mul (global.get $WIDTH) (global.get $HEIGHT)))
+    (block $break_save
+      (loop $continue_save
+        (i32.store8
+          (i32.add (local.get $i) (i32.const 2000))
+          (i32.load8_u (local.get $i))
+        )
+        (local.set $i (i32.add (local.get $i) (i32.const 1)))
+        (br_if $continue_save (i32.lt_s (local.get $i) (local.get $len)))
+      )
+    )
+
+    ;; 4 étapes
+    (call $step)
+    (call $step)
+    (call $step)
+    (call $step)
+
+    ;; On vérifie que la grille actuelle correspond à la grille originale décalée de (1, 1)
+    (local.set $i (i32.const 0))
+    (local.set $matched (i32.const 1))
+    (block $break_cmp_final
+      (loop $continue_cmp_final
+        ;; On vérifie si l'index courant correspond au bord supérieur (i < WIDTH)
+        ;; ou au bord gauche (i % WIDTH == 0) de la grille.
+        (if (i32.or
+              (i32.lt_u (local.get $i) (global.get $WIDTH))                         ;; pile: [i < WIDTH]
+              (i32.eq (i32.rem_u (local.get $i) (global.get $WIDTH)) (i32.const 0)) ;; pile: [i < WIDTH, (i % WIDTH) == 0]
+            ) ;; pile: [(i < WIDTH) | ((i % WIDTH) == 0)]
+          (then
+            ;; bord supérieur ou gauche: la case d'origine "décalée" (-1, -1) serait hors grille (donc morte par défaut)
+            ;; On doit s'assurer que la case courante est bien morte (0).
+            (if (i32.ne (i32.load8_u (local.get $i)) (i32.const 0))                  ;; pile: [valeur_cellule_actuelle != 0]
+              (then
+                (local.set $matched (i32.const 0))
+                (br $break_cmp_final) ;; Sortie précoce (early exit) pour optimiser l'exécution symbolique
+              )
+            )
+          )
+          (else
+            ;; sinon, on compare avec la case i - WIDTH - 1 dans la grille d'origine (offset 2000)
+            ;; Cela correspond à reculer d'une ligne (-WIDTH) et d'une colonne (-1)
+            (if (i32.ne
+                  (i32.load8_u (local.get $i)) ;; pile: [valeur_cellule_actuelle]
+                  (i32.load8_u
+                    (i32.add
+                      (i32.sub
+                        (i32.sub (local.get $i) (global.get $WIDTH)) ;; calcul i - WIDTH
+                        (i32.const 1)                                ;; calcul (i - WIDTH) - 1
+                      )
+                      (i32.const 2000)                               ;; calcul (i - WIDTH - 1) + 2000 (offset de la sauvegarde)
+                    ) ;; pile: [valeur_cellule_actuelle, index_origine_decale]
+                  )   ;; pile: [valeur_cellule_actuelle, valeur_cellule_origine_decalee]
+                )     ;; pile: [valeur_actuelle != valeur_origine_decalee]
+              (then
+                (local.set $matched (i32.const 0))
+                (br $break_cmp_final) ;; Sortie précoce (early exit)
+              )
+            )
+          )
+        )
+        (local.set $i (i32.add (local.get $i) (i32.const 1)))
+        (br_if $continue_cmp_final (i32.lt_s (local.get $i) (local.get $len)))
+      )
+    )
+
+    (if (local.get $matched)
+      (then
+        unreachable
+      )
+    )
+    (return)
+  )
+
   (start $propriete2)
 )
