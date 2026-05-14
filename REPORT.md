@@ -21,10 +21,10 @@ Ce projet consiste en l'implémentation d'un interpréteur WebAssembly (**concre
 Pour installer les bibliothèques nécessaires, exécutez la commande suivante :
 
 ```bash
-opam switch create . --deps-only
+opam install . --with-test --with-dev-setup --with-doc --deps-only
 ```
 
-*Note : En plus des dépendances de base, nous avons intégré **Alcotest** (tests) et **Raylib** (graphismes).*
+*Note : En plus des dépendances de base, nous avons intégré **Alcotest** (tests unitaires), **Raylib** (graphismes), et **qcheck** (génération de tests).*
 
 ### Lancer le Jeu de la Vie (Interface Graphique)
 
@@ -61,10 +61,9 @@ Le mode symbolique permet de trouver des configurations initiales répondant à 
 
 4. **Exécution :**
 ```bash
-dune exec -- ono symbolic test/cram/symbolic/config-generation.t/config-generation.wat
+dune exec -- ono symbolic config-generation/config-generation.wat
 
 ```
-
 
 5. **Interprétation du résultat :** Le solveur génère un modèle sous la forme d'une liste de symboles (`symbol_0` à `symbol_n`). Chaque valeur (0 ou 1) correspond à l'état d'une cellule, lue ligne par ligne.
 
